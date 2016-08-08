@@ -92,29 +92,34 @@ function get_tax_price($price) {
 function write_log($message, $level) {
 	$fileName = "{$level}.log";
 
-	$log_created = date("Y-m-d G:i:s"); 
+	$log_created = date("Y-m-d H:i:s"); 
 	$data = $log_created . ": " . $message . "\n";
 	
 	$fp = fopen($fileName, "a");
-	// var_dump(fwrite($fp, $data));
 	
 	$result = fwrite($fp, $data);
-	$result = isset($result);
-	// var_dump($result);
-	
-	return $result;
 
- 	// if (fwrite($fp, $data) === false)
-	// {
-		// echo "書き込みができませんでした";
-		// exit;
-		// $result = "false";
-		// $result = (boolean)$result;
+	/* issetは変数に値がセットされているかどうかを調べる関数なので、 `$result` の中身が `false` であっても結果は `true` になる。(らしい) */
+	// [修正前]
+	// $result = isset($result);
+	// return $result;
+	 
+	/* fwrite($fp, $data)は、成功時に書き込んだバイト数、失敗時に false となるので、結果がfalseであることを条件式にしてbool値をreturnする */
+	// [修正後]
+	// if ($result === false) {
+	//   return false;
+	// } else {
+	//   return true;
 	// }
 
-		// echo "書き込みが成功しました！";
-		// $result = "true";
-		// $result = (boolean)$result;
+	/* return すると関数が終了するので else は書かなくても同じ事になる */
+	// [修正後2]
+	$result = fwrite($fp, $data);
+	if ($result === false) {
+	  return false;
+	  }
+	  return true;
+
 }
 /**
  * 入力配列から指定されたカラムの値のみを返す。
